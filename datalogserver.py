@@ -4,7 +4,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import sys, ssl, argparse, os.path
 from os import path
-import datadb, datahandler
+import datahandler
 
 
 HOST_NAME = ''
@@ -31,7 +31,6 @@ if __name__ == '__main__':
 		if not path.exists(args.certfile):
 			raise argparse.ArgumentTypeError("No such file " + args.certfile)
 		httpd.socket = ssl.wrap_socket(httpd.socket, keyfile=args.keyfile, certfile=args.certfile, server_side=True)
-	httpd.db = datadb.DataDB(args.db)
 
 	try:
 		print("Ready")

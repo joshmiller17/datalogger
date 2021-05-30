@@ -8,13 +8,14 @@ import hashlib, json, sys, time
 
 ACCEPT_ALL_INPUTS = True
 
-OUT_FILE = "datalog.txt"
+OUTFILE = "datalog.txt"
 
 PATHS = {
 "LOG" : "/log"
 }
 
-NOT_YET_IMPLEMENTED = {"success":False, "info":MSG_NO_IMP}
+MAX_REQUEST_SIZE = 10000
+MSG_REQ_LARGE = "Message too large"
 
 class DataHandler(BaseHTTPRequestHandler):
 
@@ -39,8 +40,6 @@ class DataHandler(BaseHTTPRequestHandler):
 		return None
 
 	def do_HEAD(self):
-		if rate_limiter.is_rate_limited(self.client_address[0]):
-			return self.respond({"success":False, "info":MSG_TOO_MANY_REQ})
 	
 		parse = urlparse(self.path)
 		path = parse.path
@@ -62,8 +61,6 @@ class DataHandler(BaseHTTPRequestHandler):
 			self.end_headers()
 			
 	def do_POST(self):
-		if rate_limiter.is_rate_limited(self.client_address[0]):
-			return self.respond({"success":False, "info":MSG_TOO_MANY_REQ})
 		
 		content_length = int(self.headers['Content-Length'])
 		if content_length > MAX_REQUEST_SIZE:
@@ -88,8 +85,6 @@ class DataHandler(BaseHTTPRequestHandler):
 		
 
 	def do_GET(self):
-		if rate_limiter.is_rate_limited(self.client_address[0]):
-			return self.respond({"success":False, "info":MSG_TOO_MANY_REQ})
 	
 		parse = urlparse(self.path)
 		path = parse.path
@@ -106,13 +101,15 @@ class DataHandler(BaseHTTPRequestHandler):
 	
 		if path == PATHS["LOG"]:
 			entry = []
-			entry.append(self.client_address[0])
-			entry.append(time.time())
-			for k,v in args:
+			entry.append(str(self.client_address[0]))
+			entry.append(str(time.time()))
+			for k,v in args.items():
 				entry.append(str(k) + "=" + str(v))
 			
 			with open (OUTFILE, 'a') as out:
-				out.write("\t".join(entry))
+				out.write("\t".join(entry) + "\n")
+				
+			return self.respond({"success":True})
 			
 		else:
 			# return error for unrecognized request
