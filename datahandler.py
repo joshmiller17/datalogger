@@ -72,7 +72,11 @@ class DataHandler(BaseHTTPRequestHandler):
 		if rate_limiter.is_rate_limited(self.client_address[0]):
 			return self.respond({"success":False, "info":MSG_TOO_MANY_REQ})
 		
-		content_length = int(self.headers['Content-Length'])
+		#content_length = int(self.headers['Content-Length'])
+		
+		# TEST REMOVE
+		content_length = 9000
+		
 		print("Received POST, size", content_length)
 		if content_length > MAX_REQUEST_SIZE:
 			print("Too big")
