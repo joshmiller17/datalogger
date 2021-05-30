@@ -41,6 +41,9 @@ class DataHandler(BaseHTTPRequestHandler):
 
 	def do_HEAD(self):
 	
+		if rate_limiter.is_rate_limited(self.client_address[0]):
+			return self.respond({"success":False, "info":MSG_TOO_MANY_REQ})
+	
 		parse = urlparse(self.path)
 		path = parse.path
 		if len(path) > MAX_REQUEST_SIZE:
@@ -52,6 +55,9 @@ class DataHandler(BaseHTTPRequestHandler):
 			return self.respond({"success":False})
 			
 	def do_OPTIONS(self):
+			if rate_limiter.is_rate_limited(self.client_address[0]):
+				return self.respond({"success":False, "info":MSG_TOO_MANY_REQ})
+	
 			self.send_response(200)
 			self.send_header('Access-Control-Allow-Origin','*')
 			self.send_header('Access-Control-Allow-Headers', '*')
@@ -61,6 +67,9 @@ class DataHandler(BaseHTTPRequestHandler):
 			self.end_headers()
 			
 	def do_POST(self):
+	
+		if rate_limiter.is_rate_limited(self.client_address[0]):
+			return self.respond({"success":False, "info":MSG_TOO_MANY_REQ})
 		
 		content_length = int(self.headers['Content-Length'])
 		if content_length > MAX_REQUEST_SIZE:
@@ -69,29 +78,20 @@ class DataHandler(BaseHTTPRequestHandler):
 		post_data = self.rfile.read(content_length)
 		post_data = post_data.decode('utf-8')
 		
-		try:	
-			json_data = json.loads(post_data)
-		except:
-			self.respond({"success":False,"info":"Bad query"})
-			return
-		
-		if "register" in json_data:
-			handle_register(self, json_data)
-		elif "login" in json_data:
-			handle_login(self, json_data)
-		else:
-			self.respond({"success":False,"info":"POST must contain register or login key"})
-			return
+		return self.respond({"success":False,"info":"No POST implemented"})
 		
 
 	def do_GET(self):
+	
+		if rate_limiter.is_rate_limited(self.client_address[0]):
+			return self.respond({"success":False, "info":MSG_TOO_MANY_REQ})
 	
 		parse = urlparse(self.path)
 		path = parse.path
 		if len(path) > MAX_REQUEST_SIZE:
 			return self.respond({"success":False, "info":MSG_REQ_LARGE})
 
-		# get the JSON arguments
+		# get the arguments
 		args = parse_qs(parse.query)
 		
 		# convert key, [val] to key, val
