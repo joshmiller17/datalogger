@@ -13,7 +13,6 @@ PORT_NUMBER = 3004
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Data logging server.')
-	parser.add_argument('-db', default='log.db', help="Path to database file (default log.db)")
 	parser.add_argument('-keyfile', default=None, help="Path to private key if using HTTPS")
 	parser.add_argument('-certfile', default=None, help="Path to cert file if using HTTPS")
 	parser.add_argument('--nocert', action='store_true', help="Disable HTTPS encryption")
