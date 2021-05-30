@@ -77,9 +77,9 @@ class DataHandler(BaseHTTPRequestHandler):
 		if content_length > MAX_REQUEST_SIZE:
 			print("Too big")
 			return self.respond({"success":False, "info":MSG_REQ_LARGE})
-		if self.headers['Content-Type'] != "application/zip":
-			print("content type was", self.headers['Content-Type'])
-			return self.respond({"success":False, "info":"Only ZIPs accepted."})
+		# if self.headers['Content-Type'] != "application/zip":
+			# print("content type was", self.headers['Content-Type'])
+			# return self.respond({"success":False, "info":"Only ZIPs accepted."})
 		
 		print("reading")
 		post_data = self.rfile.read(content_length)
