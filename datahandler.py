@@ -78,7 +78,11 @@ class DataHandler(BaseHTTPRequestHandler):
 		post_data = self.rfile.read(content_length)
 		post_data = post_data.decode('utf-8')
 		
-		return self.respond({"success":False,"info":"No POST implemented"})
+		filename = str(self.client_address[0] + str(time.time())) + ".log"
+		with open (filename, 'w') as out:
+			out.write(post_data)
+		
+		return self.respond({"success":True})
 		
 
 	def do_GET(self):
