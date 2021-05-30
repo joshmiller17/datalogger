@@ -73,13 +73,19 @@ class DataHandler(BaseHTTPRequestHandler):
 			return self.respond({"success":False, "info":MSG_TOO_MANY_REQ})
 		
 		content_length = int(self.headers['Content-Length'])
+		print(content_length)
 		if content_length > MAX_REQUEST_SIZE:
 			return self.respond({"success":False, "info":MSG_REQ_LARGE})
-			
-		post_data = self.rfile.read(content_length)
-		post_data = post_data.decode('utf-8')
+		if self.headers['Content-Type'] != "application/zip":
+			return self.respond({"success":False, "info":"Only ZIPs accepted."})
 		
-		filename = str(self.client_address[0] + str(time.time())) + ".log"
+		post_data = self.rfile.read(content_length)
+		print(post_data)
+		
+		post_data = post_data.decode('utf-8')
+		print(post_data)
+		
+		filename = str(self.client_address[0] + str(time.time())) + ".zip"
 		with open (filename, 'w') as out:
 			out.write(post_data)
 		
